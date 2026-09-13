@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teumo Solaire — Dimensionnement</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0E1620">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Teumo Solaire">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E1620;
+    --bg-soft: #121D29;
+    --surface: #182432;
+    --surface-raised: #1E2C3D;
+    --line: #2A3B4D;
+    --gold: #E8A33D;
+    --gold-dim: #7A5A2C;
+    --teal: #46B8A6;
+    --teal-dim: #234943;
+    --text: #EAEDF1;
+    --text-muted: #8FA0B0;
+    --text-faint: #5C6D7D;
+    --danger: #D9694F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 28px 18px 60px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .brand-mark {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: #fff;
+    flex-shrink: 0;
+    padding: 3px;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .brand-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .tagline {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 8px 0 0;
+    line-height: 1.5;
+    max-width: 46ch;
+  }
+  .sunset-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .sunset-row input[type=time] {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 5px 8px;
+    border-radius: 6px;
+  }
+
+  /* ---------- Section shell ---------- */
+  section { margin-bottom: 28px; }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+  .section-sub {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+
+  /* ---------- Equipment cards ---------- */
+  .equip-list { display: flex; flex-direction: column; gap: 10px; }
+  .equip-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 12px 10px;
+  }
+  .equip-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .equip-top input[type=text] {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14.5px;
+    padding: 2px 0;
+  }
+  .equip-top input[type=text]:focus { outline: none; }
+  .equip-top input[type=text]::placeholder { color: var(--text-faint); }
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+  .remove-btn:hover { color: var(--danger); }
+
+  .equip-fields {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .field-mini label {
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    margin-bottom: 3px;
+  }
+  .field-mini .field-input {
+    display: flex;
+    align-items: baseline;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+  .field-mini input[type=number] {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+  }
+  .field-mini input[type=number]:focus { outline: none; }
+  .field-mini .unit { font-size: 11px; color: var(--text-faint); margin-left: 4px; }
+  .equip-wh {
+    margin-top: 8px;
+    font-size: 11.5px;
+    color: var(--teal);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .add-row {
+    width: 100%;
+    margin-top: 10px;
+    background: transparent;
+    border: 1px dashed var(--line);
+    color: var(--text-muted);
+    border-radius: 10px;
+    padding: 11px;
+    font-size: 13.5px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .add-row:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* ---------- Params ---------- */
+  .params-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .param {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .param label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-bottom: 5px;
+  }
+  .param select, .param input[type=number] {
+    width: 100%;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+    padding: 6px 7px;
+    border-radius: 6px;
+  }
+  .param select:focus, .param input:focus { outline: none; border-color: var(--gold-dim); }
+
+  /* ---------- Results ---------- */
+  .result-hero {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .result-card {
+    background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .result-card .num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .result-card.batt .num { color: var(--teal); }
+  .result-card.inv .num { color: var(--text); }
+  .result-card .label {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.35;
+  }
+
+  .breakdown {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .k { color: var(--text-muted); }
+  .breakdown-row .v { font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+
+  .footnote {
+    font-size: 11.5px;
+    color: var(--text-faint);
+    margin-top: 14px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 380px) {
+    .equip-fields { grid-template-columns: 1fr 1fr; }
+    .equip-fields .field-mini:nth-child(3) { grid-column: span 2; }
+    .params-grid { grid-template-columns: 1fr; }
+    .devis-fields { grid-template-columns: 1fr 1fr; }
+    .devis-fields .field-mini:nth-child(3) { grid-column: span 2; }
+    .devis-client-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Devis ---------- */
+  .devis-client-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .devis-client-grid input[type=text],
+  .devis-client-grid input[type=date] {
+    width: 100%;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13.5px;
+    padding: 6px 8px;
+    border-radius: 6px;
+  }
+  .devis-client-grid input:focus { outline: none; border-color: var(--gold-dim); }
+
+  .devis-list { display: flex; flex-direction: column; gap: 10px; }
+  .devis-row .dv-label {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 2px 0;
+  }
+  .devis-row .dv-label:focus { outline: none; }
+  .dv-total-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    padding: 6px 8px;
+  }
+
+  .devis-totals {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 12px;
+  }
+  .devis-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+  .devis-total-row.grand {
+    border-top: 1px solid var(--line);
+    margin-top: 4px;
+    padding-top: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .tva-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .devis-total-row.tva-row input[type=number] {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    border-radius: 5px;
+    padding: 3px 5px;
+    margin-left: 6px;
+  }
+
+  .print-btn {
+    width: 100%;
+    margin-top: 14px;
+    background: var(--gold);
+    border: none;
+    color: #1A1204;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: filter .15s;
+  }
+  .print-btn:hover { filter: brightness(1.08); }
+
+  #printSheet { display: none; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #printSheet, #printSheet * { visibility: visible; }
+    #printSheet {
+      display: block !important;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      background: #fff;
+      color: #161616;
+      padding: 32px;
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+    .print-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    .print-header p { margin: 0; color: #555; font-size: 12.5px; }
+    .print-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 24px;
+      margin: 20px 0;
+      font-size: 13px;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      padding: 12px 0;
+    }
+    .print-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+    .print-table th, .print-table td {
+      border: 1px solid #ccc;
+      padding: 7px 9px;
+      font-size: 12.5px;
+      text-align: left;
+    }
+    .print-table th { background: #f2f2f2; }
+    .print-table td:nth-child(2), .print-table td:nth-child(3), .print-table td:nth-child(4),
+    .print-table th:nth-child(2), .print-table th:nth-child(3), .print-table th:nth-child(4) {
+      text-align: right;
+    }
+    .print-totals { margin-top: 14px; text-align: right; font-size: 13.5px; }
+    .print-totals div { margin-bottom: 4px; }
+    .print-grand { font-weight: 700; font-size: 16.5px; margin-top: 6px; }
+    .print-footer { margin-top: 30px; font-size: 11px; color: #666; line-height: 1.6; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark"><img src="logo-mark.png" alt="Teumo Services"></div>
+      <h1>Teumo Solaire</h1>
+    </div>
+    <p class="tagline">Dimensionnement basé sur vos équipements réels : panneaux, batteries et onduleur calculés pour couvrir la période sans soleil.</p>
+    <div class="sunset-row">
+      <span>Période sans soleil de</span>
+      <input type="time" id="startHour" value="17:00">
+      <span>à</span>
+      <input type="time" id="endHour" value="06:00">
+    </div>
+  </header>
+
+  <section>
+    <p class="section-title">Équipements</p>
+    <p class="section-sub">Ajoutez chaque appareil avec sa puissance, sa quantité et ses heures d'usage par jour.</p>
+    <div class="equip-list" id="equipList"></div>
+    <button class="add-row" id="addEquip">+ Ajouter un équipement</button>
+  </section>
+
+  <section>
+    <p class="section-title">Paramètres du système</p>
+    <p class="section-sub">Valeurs par défaut calibrées pour Abidjan — ajustables selon le site.</p>
+    <div class="params-grid">
+      <div class="param">
+        <label>Ensoleillement (PSH)</label>
+        <input type="number" id="psh" value="5.2" step="0.1">
+      </div>
+      <div class="param">
+        <label>Puissance panneau (Wc)</label>
+        <input type="number" id="panelWc" value="450" step="10">
+      </div>
+      <div class="param">
+        <label>Type de batterie</label>
+        <select id="battType">
+          <option value="0.8">LiFePO4 (DoD 80%)</option>
+          <option value="0.5">AGM / Gel (DoD 50%)</option>
+        </select>
+      </div>
+      <div class="param">
+        <label>Capacité batterie unitaire (Ah)</label>
+        <input type="number" id="battAh" value="200" step="10">
+      </div>
+      <div class="param">
+        <label>Tension du système</label>
+        <select id="systemV">
+          <option value="12">12 V</option>
+          <option value="24">24 V</option>
+          <option value="48" selected>48 V</option>
+        </select>
+      </div>
+      <div class="param">
+        <label>Autonomie (jours)</label>
+        <input type="number" id="autonomy" value="1" step="1" min="1">
+      </div>
+      <div class="param">
+        <label>Rendement système (%)</label>
+        <input type="number" id="systemEff" value="75" step="1">
+      </div>
+      <div class="param">
+        <label>Marge onduleur (%)</label>
+        <input type="number" id="margin" value="25" step="5">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">Résultat du dimensionnement</p>
+    <div class="result-hero">
+      <div class="result-card">
+        <div class="num" id="outPanels">0</div>
+        <div class="label">panneaux<br><span id="outPanelWc">0</span> Wc</div>
+      </div>
+      <div class="result-card batt">
+        <div class="num" id="outBatteries">0</div>
+        <div class="label">batteries<br><span id="outBattAh">0</span> Ah</div>
+      </div>
+      <div class="result-card inv">
+        <div class="num" id="outInverter">0</div>
+        <div class="label">kVA<br>onduleur</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-row"><span class="k">Consommation journalière</span><span class="v" id="brEnergy">0 Wh</span></div>
+      <div class="breakdown-row"><span class="k">Puissance instantanée totale</span><span class="v" id="brPower">0 W</span></div>
+      <div class="breakdown-row"><span class="k">Durée période sans soleil</span><span class="v" id="brNightHours">0 h</span></div>
+      <div class="breakdown-row"><span class="k">Puissance crête requise</span><span class="v" id="brWcTotal">0 Wc</span></div>
+      <div class="breakdown-row"><span class="k">Capacité batterie requise</span><span class="v" id="brAhTotal">0 Ah</span></div>
+    </div>
+
+    <p class="footnote">Onduleur pur sinus et contrôleur MPPT recommandés dans tous les cas. Le dimensionnement panneaux couvre la recharge journalière complète ; la capacité batterie couvre la consommation sur la période sans soleil indiquée ci-dessus, multipliée par l'autonomie choisie.</p>
+  </section>
+
+  <section>
+    <p class="section-title">Devis client</p>
+    <p class="section-sub">Les lignes panneaux, batteries et onduleur reprennent automatiquement le dimensionnement ci-dessus. Complétez les prix unitaires avant de remettre le devis.</p>
+
+    <div class="devis-client-grid">
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-faint);margin-bottom:5px;">Client</label>
+        <input type="text" id="clientName" placeholder="Nom du client">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-faint);margin-bottom:5px;">Localisation</label>
+        <input type="text" id="clientLoc" placeholder="Quartier / ville">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-faint);margin-bottom:5px;">Référence</label>
+        <input type="text" id="devisRef">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;color:var(--text-faint);margin-bottom:5px;">Date</label>
+        <input type="date" id="devisDate">
+      </div>
+    </div>
+
+    <div class="devis-list" id="devisList"></div>
+    <button class="add-row" id="addDevisLine">+ Ajouter une ligne</button>
+
+    <div class="devis-totals">
+      <div class="devis-total-row">
+        <span>Sous-total</span><span id="devisSubtotal">0 FCFA</span>
+      </div>
+      <div class="devis-total-row tva-row">
+        <label class="tva-toggle"><input type="checkbox" id="tvaToggle"> Appliquer TVA</label>
+        <span><input type="number" id="tvaRate" value="18" step="1"> %</span>
+      </div>
+      <div class="devis-total-row grand">
+        <span>Total</span><span id="devisTotal">0 FCFA</span>
+      </div>
+    </div>
+
+    <button class="print-btn" id="printDevis">Imprimer / exporter en PDF</button>
+  </section>
+
+</div>
+
+<div id="printSheet">
+  <div class="print-header">
+    <img src="logo-mark.png" alt="Teumo Services" style="width:52px;height:52px;object-fit:contain;float:left;margin-right:14px;">
+    <h2>Teumo Services</h2>
+    <p>Sécurité électronique · Énergie solaire · Installations satellite — Abidjan</p>
+    <div style="clear:both;"></div>
+  </div>
+  <div class="print-meta">
+    <div><strong>Devis :</strong> <span id="pRef"></span></div>
+    <div><strong>Date :</strong> <span id="pDate"></span></div>
+    <div><strong>Client :</strong> <span id="pClient"></span></div>
+    <div><strong>Localisation :</strong> <span id="pLoc"></span></div>
+  </div>
+  <table class="print-table">
+    <thead><tr><th>Désignation</th><th>Qté</th><th>Prix unitaire</th><th>Total</th></tr></thead>
+    <tbody id="pItems"></tbody>
+  </table>
+  <div class="print-totals">
+    <div>Sous-total : <span id="pSubtotal"></span></div>
+    <div id="pTvaLine" style="display:none;">TVA (<span id="pTvaRate"></span>%) : <span id="pTvaAmount"></span></div>
+    <div class="print-grand">Total : <span id="pTotal"></span></div>
+  </div>
+  <p class="print-footer">Devis établi par Teumo Services. Matériel MPPT et onduleur pur sinus. Validité de l'offre : 30 jours à compter de la date d'émission.</p>
+</div>
+
+<script>
+  const defaultEquip = [
+    { name: "Réfrigérateur", power: 150, qty: 1, hours: 24 },
+    { name: "Téléviseur", power: 120, qty: 1, hours: 5 },
+    { name: "Lampes LED", power: 10, qty: 6, hours: 6 },
+    { name: "Routeur Wi-Fi", power: 15, qty: 1, hours: 24 },
+    { name: "Ventilateur", power: 60, qty: 2, hours: 6 }
+  ];
+
+  const equipList = document.getElementById('equipList');
+  let idCounter = 0;
+
+  function makeCard(item) {
+    const id = 'eq' + (idCounter++);
+    const card = document.createElement('div');
+    card.className = 'equip-card';
+    card.dataset.id = id;
+    card.innerHTML = `
+      <div class="equip-top">
+        <input type="text" class="eq-name" placeholder="Nom de l'équipement" value="${item.name}">
+        <button class="remove-btn" title="Supprimer">&times;</button>
+      </div>
+      <div class="equip-fields">
+        <div class="field-mini">
+          <label>Puissance</label>
+          <div class="field-input"><input type="number" class="eq-power" value="${item.power}" min="0"><span class="unit">W</span></div>
+        </div>
+        <div class="field-mini">
+          <label>Quantité</label>
+          <div class="field-input"><input type="number" class="eq-qty" value="${item.qty}" min="1"><span class="unit">x</span></div>
+        </div>
+        <div class="field-mini">
+          <label>Usage / jour</label>
+          <div class="field-input"><input type="number" class="eq-hours" value="${item.hours}" min="0" step="0.5"><span class="unit">h</span></div>
+        </div>
+      </div>
+      <div class="equip-wh"></div>
+    `;
+    card.querySelector('.remove-btn').addEventListener('click', () => {
+      card.remove();
+      compute();
+    });
+    card.querySelectorAll('input').forEach(inp => inp.addEventListener('input', compute));
+    return card;
+  }
+
+  defaultEquip.forEach(item => equipList.appendChild(makeCard(item)));
+
+  document.getElementById('addEquip').addEventListener('click', () => {
+    equipList.appendChild(makeCard({ name: "", power: 0, qty: 1, hours: 0 }));
+    compute();
+  });
+
+  function standardInverterSize(kva) {
+    const sizes = [1, 1.5, 2, 3, 5, 6, 8, 10, 15, 20, 30];
+    for (const s of sizes) if (kva <= s) return s;
+    return Math.ceil(kva);
+  }
+
+  function nightHoursBetween(start, end) {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    let startMin = sh * 60 + sm;
+    let endMin = eh * 60 + em;
+    if (endMin <= startMin) endMin += 24 * 60;
+    return (endMin - startMin) / 60;
+  }
+
+  function compute() {
+    let totalWh = 0;
+    let totalInstantW = 0;
+
+    document.querySelectorAll('.equip-card').forEach(card => {
+      const power = parseFloat(card.querySelector('.eq-power').value) || 0;
+      const qty = parseFloat(card.querySelector('.eq-qty').value) || 0;
+      const hours = parseFloat(card.querySelector('.eq-hours').value) || 0;
+      const wh = power * qty * hours;
+      totalWh += wh;
+      totalInstantW += power * qty;
+      card.querySelector('.equip-wh').textContent = wh > 0 ? `≈ ${Math.round(wh)} Wh/jour` : '';
+    });
+
+    const psh = parseFloat(document.getElementById('psh').value) || 5.2;
+    const panelWc = parseFloat(document.getElementById('panelWc').value) || 450;
+    const dod = parseFloat(document.getElementById('battType').value) || 0.8;
+    const battAh = parseFloat(document.getElementById('battAh').value) || 200;
+    const systemV = parseFloat(document.getElementById('systemV').value) || 48;
+    const autonomy = parseFloat(document.getElementById('autonomy').value) || 1;
+    const systemEff = (parseFloat(document.getElementById('systemEff').value) || 75) / 100;
+    const margin = (parseFloat(document.getElementById('margin').value) || 25) / 100;
+    const start = document.getElementById('startHour').value || "17:00";
+    const end = document.getElementById('endHour').value || "06:00";
+    const nightHours = nightHoursBetween(start, end);
+
+    // Energie consommée pendant la période sans soleil (proportion des heures d'usage qui tombent la nuit,
+    // approximée ici par la part des heures totales de la journée)
+    const nightShare = Math.min(1, nightHours / 24);
+    const nightWh = totalWh * nightShare + (totalWh * (1 - nightShare)) * 0; // consommation à couvrir par batterie
+
+    // Panneaux : couvrent la totalité de la consommation journalière
+    const wcNeeded = totalWh / (psh * systemEff);
+    const panelsNeeded = Math.max(1, Math.ceil(wcNeeded / panelWc));
+
+    // Batteries : couvrent la consommation de la période sans soleil, sur l'autonomie choisie
+    const ahNeeded = (totalWh * (nightHours / 24) * autonomy) / (dod * systemV) || 0;
+    const battNeeded = Math.max(1, Math.ceil((ahNeeded || (totalWh * autonomy) / (dod * systemV)) / battAh));
+
+    // Onduleur : puissance instantanée + marge, arrondi à une taille standard
+    const invKvaRaw = (totalInstantW * (1 + margin)) / 1000;
+    const invKva = standardInverterSize(invKvaRaw);
+
+    document.getElementById('outPanels').textContent = panelsNeeded;
+    document.getElementById('outPanelWc').textContent = Math.round(panelsNeeded * panelWc);
+    document.getElementById('outBatteries').textContent = battNeeded;
+    document.getElementById('outBattAh').textContent = Math.round(battNeeded * battAh);
+    document.getElementById('outInverter').textContent = invKva;
+
+    document.getElementById('brEnergy').textContent = `${Math.round(totalWh)} Wh`;
+    document.getElementById('brPower').textContent = `${Math.round(totalInstantW)} W`;
+    document.getElementById('brNightHours').textContent = `${nightHours.toFixed(1)} h (${start} → ${end})`;
+    document.getElementById('brWcTotal').textContent = `${Math.round(wcNeeded)} Wc`;
+    document.getElementById('brAhTotal').textContent = `${Math.round((totalWh * (nightHours/24) * autonomy) / (dod * systemV))} Ah`;
+
+    if (typeof syncDevisFromDimensioning === 'function') {
+      const battTypeEl = document.getElementById('battType');
+      const battLabel = `Batteries ${battTypeEl.options[battTypeEl.selectedIndex].text.split(' (')[0]} ${battAh} Ah ${systemV} V`;
+      syncDevisFromDimensioning({
+        panelsNeeded: panelsNeeded,
+        panelWc: panelWc,
+        battNeeded: battNeeded,
+        battAh: battAh,
+        battLabel: battLabel,
+        invKva: invKva
+      });
+      computeDevis();
+    }
+  }
+
+  document.querySelectorAll('#psh, #panelWc, #battType, #battAh, #systemV, #autonomy, #systemEff, #margin, #startHour, #endHour')
+    .forEach(el => el.addEventListener('input', compute));
+  document.querySelectorAll('#battType, #systemV').forEach(el => el.addEventListener('change', compute));
+
+  // ---------- Devis ----------
+  const devisList = document.getElementById('devisList');
+  let devisIdCounter = 0;
+
+  function fmtFcfa(n) {
+    return Math.round(n).toLocaleString('fr-FR') + ' FCFA';
+  }
+
+  function makeDevisRow({ label, qty, price, auto }) {
+    const id = 'dv' + (devisIdCounter++);
+    const row = document.createElement('div');
+    row.className = 'equip-card devis-row';
+    row.dataset.id = id;
+    if (auto) row.dataset.auto = auto;
+    row.innerHTML = `
+      <div class="equip-top">
+        <input type="text" class="dv-label" value="${label}">
+        <button class="remove-btn" title="Supprimer">&times;</button>
+      </div>
+      <div class="equip-fields devis-fields">
+        <div class="field-mini">
+          <label>Quantité</label>
+          <div class="field-input"><input type="number" class="dv-qty" value="${qty}" min="0"></div>
+        </div>
+        <div class="field-mini">
+          <label>Prix unit. (FCFA)</label>
+          <div class="field-input"><input type="number" class="dv-price" value="${price}" min="0" step="1000"></div>
+        </div>
+        <div class="field-mini">
+          <label>Total</label>
+          <div class="field-input"><span class="dv-total-display">0 FCFA</span></div>
+        </div>
+      </div>
+    `;
+    row.querySelector('.remove-btn').addEventListener('click', () => {
+      row.remove();
+      computeDevis();
+    });
+    row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', computeDevis));
+    return row;
+  }
+
+  function initDevis() {
+    devisList.appendChild(makeDevisRow({ label: 'Panneaux solaires 450 Wc', qty: 1, price: 0, auto: 'panels' }));
+    devisList.appendChild(makeDevisRow({ label: 'Batteries LiFePO4 200 Ah 48 V', qty: 1, price: 0, auto: 'batteries' }));
+    devisList.appendChild(makeDevisRow({ label: 'Onduleur pur sinus 1 kVA', qty: 1, price: 0, auto: 'inverter' }));
+    devisList.appendChild(makeDevisRow({ label: 'Régulateur de charge MPPT', qty: 1, price: 0 }));
+    devisList.appendChild(makeDevisRow({ label: 'Câbles & accessoires (forfait)', qty: 1, price: 0 }));
+    devisList.appendChild(makeDevisRow({ label: 'Installation & mise en service (forfait)', qty: 1, price: 0 }));
+  }
+
+  document.getElementById('addDevisLine').addEventListener('click', () => {
+    devisList.appendChild(makeDevisRow({ label: '', qty: 1, price: 0 }));
+    computeDevis();
+  });
+
+  function syncDevisFromDimensioning({ panelsNeeded, panelWc, battNeeded, battAh, battLabel, invKva }) {
+    const panelRow = devisList.querySelector('[data-auto="panels"]');
+    if (panelRow) {
+      panelRow.querySelector('.dv-label').value = `Panneaux solaires ${panelWc} Wc`;
+      panelRow.querySelector('.dv-qty').value = panelsNeeded;
+    }
+    const battRow = devisList.querySelector('[data-auto="batteries"]');
+    if (battRow) {
+      battRow.querySelector('.dv-label').value = battLabel;
+      battRow.querySelector('.dv-qty').value = battNeeded;
+    }
+    const invRow = devisList.querySelector('[data-auto="inverter"]');
+    if (invRow) {
+      invRow.querySelector('.dv-label').value = `Onduleur pur sinus ${invKva} kVA`;
+      invRow.querySelector('.dv-qty').value = 1;
+    }
+  }
+
+  function computeDevis() {
+    let subtotal = 0;
+    devisList.querySelectorAll('.devis-row').forEach(row => {
+      const qty = parseFloat(row.querySelector('.dv-qty').value) || 0;
+      const price = parseFloat(row.querySelector('.dv-price').value) || 0;
+      const total = qty * price;
+      subtotal += total;
+      row.querySelector('.dv-total-display').textContent = fmtFcfa(total);
+    });
+
+    const tvaOn = document.getElementById('tvaToggle').checked;
+    const tvaRate = parseFloat(document.getElementById('tvaRate').value) || 0;
+    const tvaAmount = tvaOn ? subtotal * (tvaRate / 100) : 0;
+    const total = subtotal + tvaAmount;
+
+    document.getElementById('devisSubtotal').textContent = fmtFcfa(subtotal);
+    document.getElementById('devisTotal').textContent = fmtFcfa(total);
+  }
+
+  document.getElementById('tvaToggle').addEventListener('change', computeDevis);
+  document.getElementById('tvaRate').addEventListener('input', computeDevis);
+
+  function generateRef() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const rand = String(Math.floor(Math.random() * 900) + 100);
+    return `TS-${y}${m}${day}-${rand}`;
+  }
+
+  document.getElementById('devisRef').value = generateRef();
+  document.getElementById('devisDate').value = new Date().toISOString().slice(0, 10);
+
+  initDevis();
+
+  document.getElementById('printDevis').addEventListener('click', () => {
+    document.getElementById('pRef').textContent = document.getElementById('devisRef').value;
+    document.getElementById('pDate').textContent = document.getElementById('devisDate').value;
+    document.getElementById('pClient').textContent = document.getElementById('clientName').value || '—';
+    document.getElementById('pLoc').textContent = document.getElementById('clientLoc').value || '—';
+
+    const pItems = document.getElementById('pItems');
+    pItems.innerHTML = '';
+    let subtotal = 0;
+    devisList.querySelectorAll('.devis-row').forEach(row => {
+      const label = row.querySelector('.dv-label').value || '—';
+      const qty = parseFloat(row.querySelector('.dv-qty').value) || 0;
+      const price = parseFloat(row.querySelector('.dv-price').value) || 0;
+      const total = qty * price;
+      subtotal += total;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${label}</td><td>${qty}</td><td>${fmtFcfa(price)}</td><td>${fmtFcfa(total)}</td>`;
+      pItems.appendChild(tr);
+    });
+
+    const tvaOn = document.getElementById('tvaToggle').checked;
+    const tvaRate = parseFloat(document.getElementById('tvaRate').value) || 0;
+    const tvaAmount = tvaOn ? subtotal * (tvaRate / 100) : 0;
+    const total = subtotal + tvaAmount;
+
+    document.getElementById('pSubtotal').textContent = fmtFcfa(subtotal);
+    document.getElementById('pTvaLine').style.display = tvaOn ? 'block' : 'none';
+    document.getElementById('pTvaRate').textContent = tvaRate;
+    document.getElementById('pTvaAmount').textContent = fmtFcfa(tvaAmount);
+    document.getElementById('pTotal').textContent = fmtFcfa(total);
+
+    window.print();
+  });
+
+  compute();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("service-worker.js").catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>
